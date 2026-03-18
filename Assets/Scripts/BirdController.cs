@@ -6,15 +6,20 @@ public class BirdController : MonoBehaviour
     [SerializeField] private float flapForce = 7f;
     [SerializeField] private float topBound = 4.5f;
     [SerializeField] private float bottomBound = -4.5f;
+    [SerializeField] private float rotationSpeed = 300f;
 
     private Rigidbody2D rigidBody;
     private float initialGravityScale;
+    private Vector3 initialScale;
+    private Vector3 initialPosition;
     private bool isDead = false;
 
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
         initialGravityScale = rigidBody.gravityScale;
+        initialScale = transform.localScale;
+        initialPosition = transform.position;
     }
 
     private void Update()
@@ -24,10 +29,30 @@ public class BirdController : MonoBehaviour
             return;
         }
 
+        // wait for first tap before starting
+        if (GameManager.Instance != null && GameManager.Instance.State == GameState.Idle)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+            {
+                GameManager.Instance.StartGame();
+                Flap();
+            }
+
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
             Flap();
         }
+
+        // tilt up when going up, nose dive when falling, multiplying by 4 felt right
+        float targetAngle = Mathf.Clamp(rigidBody.linearVelocity.y * 4f, -90f, 30f);
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            Quaternion.Euler(0f, 0f, targetAngle),
+            rotationSpeed * Time.deltaTime
+        );
 
         if (transform.position.y > topBound || transform.position.y < bottomBound)
         {
@@ -37,6 +62,11 @@ public class BirdController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (GameManager.Instance != null && GameManager.Instance.State == GameState.Idle)
+        {
+            return;
+        }
+
         Die();
     }
 
@@ -55,7 +85,8 @@ public class BirdController : MonoBehaviour
 
     private IEnumerator SquashStretchRoutine()
     {
-        Vector3 stretchedScale = new Vector3(0.7f, 1.4f, 1f);
+        // squash on flap then lerp back to normal
+        Vector3 stretchedScale = new Vector3(initialScale.x * 0.7f, initialScale.y * 1.4f, 1f);
         float duration = 0.2f;
         float elapsed = 0f;
 
@@ -63,12 +94,12 @@ public class BirdController : MonoBehaviour
 
         while (elapsed < duration)
         {
-            transform.localScale = Vector3.Lerp(stretchedScale, Vector3.one, elapsed / duration);
+            transform.localScale = Vector3.Lerp(stretchedScale, initialScale, elapsed / duration);
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        transform.localScale = Vector3.one;
+        transform.localScale = initialScale;
     }
 
     public void Die()
@@ -93,13 +124,20 @@ public class BirdController : MonoBehaviour
         }
     }
 
+    public void StartPlaying()
+    {
+        rigidBody.gravityScale = initialGravityScale;
+    }
+
     public void ResetBird()
     {
         StopAllCoroutines();
         isDead = false;
-        rigidBody.gravityScale = initialGravityScale;
+        // gravity off until player taps
+        rigidBody.gravityScale = 0f;
         rigidBody.linearVelocity = Vector2.zero;
-        transform.position = new Vector3(-3f, 0f, 0f);
-        transform.localScale = Vector3.one;
+        transform.position = initialPosition;
+        transform.localScale = initialScale;
+        transform.rotation = Quaternion.identity;
     }
 }

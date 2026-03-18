@@ -30,6 +30,7 @@ public class CameraShake : MonoBehaviour
 
             transform.localPosition = originalPosition + new Vector3(x, y, 0f);
 
+            // using unscaled so it still shakes even when timeScale is 0
             elapsed += Time.unscaledDeltaTime;
             yield return null;
         }

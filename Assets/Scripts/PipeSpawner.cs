@@ -5,7 +5,7 @@ public class PipeSpawner : MonoBehaviour
     [SerializeField] private GameObject pipePairPrefab;
     [SerializeField] private float spawnInterval = 2f;
     [SerializeField] private float spawnX = 12f;
-    [SerializeField] private float gapCenterMin = -2f;
+    [SerializeField] private float gapCenterMin = -1f;
     [SerializeField] private float gapCenterMax = 2f;
 
     [SerializeField] private float gapSizeStart = 3f;
@@ -16,6 +16,7 @@ public class PipeSpawner : MonoBehaviour
     [SerializeField] private float scrollSpeedMax = 6f;
     [SerializeField] private float scrollSpeedIncrease = 0.2f;
 
+    // every X pipes make it harder
     [SerializeField] private int pipesPerDifficultyStep = 5;
 
     private float currentGapSize;
@@ -30,7 +31,8 @@ public class PipeSpawner : MonoBehaviour
         currentScrollSpeed = scrollSpeedStart;
         pipesSpawned = 0;
         spawnTimer = spawnInterval;
-        isActive = true;
+        // dont spawn until game starts
+        isActive = false;
     }
 
     private void Update()
@@ -59,30 +61,19 @@ public class PipeSpawner : MonoBehaviour
 
         pipeController.SetScrollSpeed(currentScrollSpeed);
         pipeController.SetGap(currentGapSize);
-        SetRandomPipeColor(pipePair);
 
         pipesSpawned++;
 
+        // bump difficulty every few pipes
         if (pipesSpawned % pipesPerDifficultyStep == 0)
         {
             IncreaseDifficulty();
         }
     }
 
-    private void SetRandomPipeColor(GameObject pipePair)
-    {
-        float green = Random.Range(0.55f, 0.9f);
-        Color pipeColor = new Color(0.15f, green, 0.25f, 1f);
-
-        SpriteRenderer topRenderer = pipePair.transform.Find("TopPipe").GetComponent<SpriteRenderer>();
-        SpriteRenderer bottomRenderer = pipePair.transform.Find("BottomPipe").GetComponent<SpriteRenderer>();
-
-        topRenderer.color = pipeColor;
-        bottomRenderer.color = pipeColor;
-    }
-
     private void IncreaseDifficulty()
     {
+        // shrink gap and speed up, clamped so it doesnt get impossible
         currentGapSize = Mathf.Max(currentGapSize - gapShrinkAmount, gapSizeMin);
         currentScrollSpeed = Mathf.Min(currentScrollSpeed + scrollSpeedIncrease, scrollSpeedMax);
     }

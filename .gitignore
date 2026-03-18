@@ -19,6 +19,5 @@ Build/
 # User-specific
 UserSettings/
 
-
 # Auto-generated package lock, dont track this
 Packages/packages-lock.json

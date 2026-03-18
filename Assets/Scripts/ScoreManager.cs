@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -7,7 +6,7 @@ public class ScoreManager : MonoBehaviour
 
     private const string HIGH_SCORE_KEY = "HS_FlappyBird";
 
-    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private SpriteScoreDisplay scoreDisplay;
 
     private int currentScore;
 
@@ -25,13 +24,13 @@ public class ScoreManager : MonoBehaviour
     public void AddScore()
     {
         currentScore++;
-        scoreText.text = currentScore.ToString();
+        scoreDisplay.UpdateDisplay(currentScore);
     }
 
     public void ResetScore()
     {
         currentScore = 0;
-        scoreText.text = "0";
+        scoreDisplay.UpdateDisplay(0);
     }
 
     public int GetScore()

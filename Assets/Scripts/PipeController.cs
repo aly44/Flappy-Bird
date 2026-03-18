@@ -5,6 +5,7 @@ public class PipeController : MonoBehaviour
     [SerializeField] private float scrollSpeed = 3f;
     [SerializeField] private float despawnX = -12f;
 
+    // half the visual height of the pipe sprite at its current scale
     private const float PIPE_HALF_HEIGHT = 4f;
 
     private Transform topPipe;
@@ -33,6 +34,7 @@ public class PipeController : MonoBehaviour
 
     public void SetGap(float gapSize)
     {
+        // offset each pipe by half the gap plus the pipe height so they line up around the center
         float halfGap = gapSize / 2f;
 
         topPipe.localPosition = new Vector3(0f, halfGap + PIPE_HALF_HEIGHT, 0f);

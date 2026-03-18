@@ -1,6 +1,12 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
+
+public enum GameState
+{
+    Idle,
+    Playing,
+    Dead
+}
 
 public class GameManager : MonoBehaviour
 {
@@ -10,10 +16,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PipeSpawner pipeSpawner;
     [SerializeField] private CameraShake cameraShake;
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject messagePanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
 
-    private bool isGameOver;
+    public GameState State { get; private set; }
 
     private void Awake()
     {
@@ -26,14 +33,31 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        // start in idle, show message screen, freeze bird
+        State = GameState.Idle;
+        messagePanel.SetActive(true);
+        gameOverPanel.SetActive(false);
+        birdController.ResetBird();
+    }
+
+    public void StartGame()
+    {
+        State = GameState.Playing;
+        messagePanel.SetActive(false);
+        birdController.StartPlaying();
+        pipeSpawner.StartSpawning();
+    }
+
     public void OnBirdDied()
     {
-        if (isGameOver)
+        if (State == GameState.Dead)
         {
             return;
         }
 
-        isGameOver = true;
+        State = GameState.Dead;
         pipeSpawner.StopSpawning();
         cameraShake.Shake();
 
@@ -42,12 +66,14 @@ public class GameManager : MonoBehaviour
         finalScoreText.text = "Score: " + ScoreManager.Instance.GetScore().ToString();
         highScoreText.text = "Best: " + ScoreManager.Instance.GetHighScore().ToString();
 
+        // freeze time so game over panel feels clean
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void RestartGame()
     {
+        // destroy leftover pipes from last run
         GameObject[] pipes = GameObject.FindGameObjectsWithTag("Pipe");
 
         foreach (GameObject pipe in pipes)
@@ -55,17 +81,11 @@ public class GameManager : MonoBehaviour
             Destroy(pipe);
         }
 
-        isGameOver = false;
         Time.timeScale = 1f;
         gameOverPanel.SetActive(false);
         ScoreManager.Instance.ResetScore();
         birdController.ResetBird();
-        pipeSpawner.StartSpawning();
-    }
-
-    public void LoadMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        State = GameState.Idle;
+        messagePanel.SetActive(true);
     }
 }
