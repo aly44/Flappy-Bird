@@ -43,6 +43,12 @@ public class BirdController : MonoBehaviour
     private void Flap()
     {
         rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, flapForce);
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayFlap();
+        }
+
         StopCoroutine(nameof(SquashStretchRoutine));
         StartCoroutine(nameof(SquashStretchRoutine));
     }
@@ -75,6 +81,11 @@ public class BirdController : MonoBehaviour
         isDead = true;
         rigidBody.linearVelocity = Vector2.zero;
         rigidBody.gravityScale = 0f;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayDeath();
+        }
 
         if (GameManager.Instance != null)
         {

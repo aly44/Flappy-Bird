@@ -7,6 +7,11 @@ public class ScoreTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             ScoreManager.Instance.AddScore();
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayScore();
+            }
         }
     }
 }
