@@ -59,6 +59,7 @@ public class PipeSpawner : MonoBehaviour
 
         pipeController.SetScrollSpeed(currentScrollSpeed);
         pipeController.SetGap(currentGapSize);
+        SetRandomPipeColor(pipePair);
 
         pipesSpawned++;
 
@@ -66,6 +67,18 @@ public class PipeSpawner : MonoBehaviour
         {
             IncreaseDifficulty();
         }
+    }
+
+    private void SetRandomPipeColor(GameObject pipePair)
+    {
+        float green = Random.Range(0.55f, 0.9f);
+        Color pipeColor = new Color(0.15f, green, 0.25f, 1f);
+
+        SpriteRenderer topRenderer = pipePair.transform.Find("TopPipe").GetComponent<SpriteRenderer>();
+        SpriteRenderer bottomRenderer = pipePair.transform.Find("BottomPipe").GetComponent<SpriteRenderer>();
+
+        topRenderer.color = pipeColor;
+        bottomRenderer.color = pipeColor;
     }
 
     private void IncreaseDifficulty()

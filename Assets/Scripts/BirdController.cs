@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BirdController : MonoBehaviour
@@ -42,6 +43,26 @@ public class BirdController : MonoBehaviour
     private void Flap()
     {
         rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, flapForce);
+        StopCoroutine(nameof(SquashStretchRoutine));
+        StartCoroutine(nameof(SquashStretchRoutine));
+    }
+
+    private IEnumerator SquashStretchRoutine()
+    {
+        Vector3 stretchedScale = new Vector3(0.7f, 1.4f, 1f);
+        float duration = 0.2f;
+        float elapsed = 0f;
+
+        transform.localScale = stretchedScale;
+
+        while (elapsed < duration)
+        {
+            transform.localScale = Vector3.Lerp(stretchedScale, Vector3.one, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localScale = Vector3.one;
     }
 
     public void Die()
@@ -63,9 +84,11 @@ public class BirdController : MonoBehaviour
 
     public void ResetBird()
     {
+        StopAllCoroutines();
         isDead = false;
         rigidBody.gravityScale = initialGravityScale;
         rigidBody.linearVelocity = Vector2.zero;
         transform.position = new Vector3(-3f, 0f, 0f);
+        transform.localScale = Vector3.one;
     }
 }

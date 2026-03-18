@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private BirdController birdController;
     [SerializeField] private PipeSpawner pipeSpawner;
+    [SerializeField] private CameraShake cameraShake;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
 
         isGameOver = true;
         pipeSpawner.StopSpawning();
+        cameraShake.Shake();
 
         ScoreManager.Instance.UpdateHighScore();
 
