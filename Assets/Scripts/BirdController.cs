@@ -34,6 +34,11 @@ public class BirdController : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Die();
+    }
+
     private void Flap()
     {
         rigidBody.linearVelocity = new Vector2(rigidBody.linearVelocity.x, flapForce);
@@ -49,6 +54,11 @@ public class BirdController : MonoBehaviour
         isDead = true;
         rigidBody.linearVelocity = Vector2.zero;
         rigidBody.gravityScale = 0f;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnBirdDied();
+        }
     }
 
     public void ResetBird()
