@@ -1,0 +1,24 @@
+# Unity generated
+Library/
+Temp/
+obj/
+Logs/
+MemoryCaptures/
+Recordings/
+
+# Build output
+Builds/
+Build/
+
+# Visual Studio
+.vs/
+.vsconfig
+*.sln
+*.csproj
+
+# User-specific
+UserSettings/
+
+
+# Auto-generated package lock, dont track this
+Packages/packages-lock.json
