@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -9,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PipeSpawner pipeSpawner;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
+    [SerializeField] private TextMeshProUGUI highScoreText;
 
     private bool isGameOver;
 
@@ -32,7 +34,12 @@ public class GameManager : MonoBehaviour
 
         isGameOver = true;
         pipeSpawner.StopSpawning();
+
+        ScoreManager.Instance.UpdateHighScore();
+
         finalScoreText.text = "Score: " + ScoreManager.Instance.GetScore().ToString();
+        highScoreText.text = "Best: " + ScoreManager.Instance.GetHighScore().ToString();
+
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
     }
@@ -52,5 +59,11 @@ public class GameManager : MonoBehaviour
         ScoreManager.Instance.ResetScore();
         birdController.ResetBird();
         pipeSpawner.StartSpawning();
+    }
+
+    public void LoadMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 }
